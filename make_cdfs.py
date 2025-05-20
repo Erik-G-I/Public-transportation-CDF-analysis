@@ -3,7 +3,7 @@
 
 from datetime import datetime
 from matplotlib import pyplot as plt
-from cdf_methods import plot_cdf, compute_deviations, map_colors_to_stops, create_colormaps
+from cdf_methods import plot_cdf, compute_deviations, create_colormaps, specificTimeDeviation
 import numpy as np
 import pandas as pd
 
@@ -81,12 +81,11 @@ bus39df2 = bus39df2.dropna(subset=["Retning"])
 # Put all bus lines together in a list
 # REMOVED LINE 49 - SKOLERUTER
 allBusLinesOLD = [bus6, bus10, bus11, bus12, bus13, bus14, bus15, bus16E, bus18, bus20, bus24, bus40, bus41, bus42, bus43, bus44, bus45, bus46, bus48, bus81, bus82]
-allBusLines =  [bus6df3, bus81df3, bus3df2, bus12df2, bus14df2, bus16Edf2, bus19df2, bus20df2, bus22df2, bus23df2, bus23Edf2, bus26df2, bus27df2, bus30df2, bus36df2, bus37df2, bus39df2, bus300df2, bus300Edf2, bus310df2, bus313df2]
+allBusLines =  [bus12df2]#[bus6df3, bus81df3, bus3df2, bus12df2, bus14df2, bus16Edf2, bus19df2, bus20df2, bus22df2, bus23df2, bus23Edf2, bus26df2, bus27df2, bus30df2, bus36df2, bus37df2, bus39df2, bus300df2, bus300Edf2, bus310df2, bus313df2]
 
 #%%
 # Compute deviations for all stops on all bus lines
 deviation_dict = compute_deviations(allBusLines)
-# print(deviation_dict["12"])
 
 # Create color maps for each line
 colormaps = create_colormaps(allBusLines)
@@ -182,4 +181,22 @@ for (stop, direction, sequence, deviations) in deviation_dict["16E"]:
     plt.grid(True)
     plt.savefig(f'CDF_16E_seq{sequence}_dir{direction}_{stop}.png')
     plt.show()
+
+    
+# %%
+
+floridaRushhour = specificTimeDeviation("Florida", bus12df2, "16:28", 1)
+# %%
+plot_cdf(floridaRushhour,"Florida seq 21", colormap=colormaps['112'])
+plt.yticks(np.arange(0, 1.1, 0.05))
+plt.xticks(np.arange(-10, 20, 2))
+plt.xlim(left=-10)
+plt.xlim(right=20)
+plt.xlabel('Deviations in minutes from planned time')
+plt.ylabel('Cumulative Probability')
+plt.title(f'Line 12 Direction 1')
+plt.grid(True)
+plt.legend()
+plt.savefig(f'/Users/erikingebrigtsen/Documents/UIB/Master/CDFplots/CDF_12_Florida_rush_retning_1.png')
+plt.show()
 # %%

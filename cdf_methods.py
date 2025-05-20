@@ -3,34 +3,24 @@ from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
 
-# # Function to calculate deviation of arrival time of buses at a given stop
-# def calculateDeviations(stopName, line, time, to_from, arrive_depart, direction):
-#     # Calculate the deviations of the buses arriving at the given stop.
-#     # stopName: Name of the stop
-#     # line: Line number
-#     # time: planned time of arrival or departure
-#     # to_from: "HoldeplassTilNavn" if the bus is arriving at the stop, "HoldeplassFraNavn" if the bus is departing from the stop.
-#     # arrive_depart: "AnkomstHoldeplassTilPlanlagt" if the bus is arriving at the stop, "AvgangstidPlanlagt" if the bus is departing from the stop.
-#     # direction: 1 if the bus is going in the direction following its route name, 2 if the bus going in the opposite direction.
-#     # Returns a list of deviations of the buses arriving at the given stop.
-#     cond1 = line[to_from] == stopName
-#     cond2 = line["Retning"] == direction
-#     cond3 = line[arrive_depart].str.contains(time)
-#     combinedCond = cond1 & cond2 & cond3
-#     appliedConstraint = line[combinedCond]
-#     deviations = []
-#     for row in appliedConstraint.iterrows():
-#         plan = row[1][arrive_depart]
-#         arrive_depart_rt = arrive_depart.replace("Planlagt", "Faktisk")
-#         faktisk = row[1][arrive_depart_rt]
-#         try:
-#             avvik = (datetime.strptime(faktisk, "%Y.%m.%d %H:%M:%S") - datetime.strptime(plan, "%Y.%m.%d %H:%M:%S")).total_seconds() /60
-#         except:
-#             continue
-#         #print("Planlagt:",plan,"Faktisk:", faktisk,"Avvik:", avvik)
-#         deviations.append(float(avvik))
-#     print(deviations)
-#     return deviations
+# Function to calculate deviation of arrival time of buses at a given stop
+def specificTimeDeviation(stopName, line, time, direction):
+    cond1 = line["HoldeplassFraNavn"] == stopName
+    cond2 = line["Retning"] == direction
+    cond3 = line["AvgangstidPlanlagt"].str.contains(time)
+    combinedCond = cond1 & cond2 & cond3
+    appliedConstraint = line[combinedCond]
+    deviations = []
+    for row in appliedConstraint.iterrows():
+        planned = row[1]["AvgangstidPlanlagt"]
+        actual = row[1]["AvgangstidFaktisk"]
+        try:
+            deviation = (datetime.strptime(actual, "%Y-%m-%d %H:%M:%S") - datetime.strptime(planned, "%Y-%m-%d %H:%M:%S")).total_seconds() /60
+        except:
+            continue
+        deviations.append(float(deviation))
+    print(deviations)
+    return deviations
 
 
 # Function to compute and plot the CDF with polynomial regression
