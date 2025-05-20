@@ -21,9 +21,11 @@ usecols = ['Rute', 'Rutenavn', 'DriftsDato', 'Ukedag', 'SekvensHoldeplassFra', '
 dtypes = {'Rute': str,  'Rutenavn': str,  'DriftsDato': str,  'Ukedag': str, 'SekvensHoldeplassFra': pd.Int8Dtype(), 'HoldeplassFraNavn': str,  'AvgangstidPlanlagt': str, 'AvgangstidFaktisk': str, 'SekvensHoldeplassTil': pd.Int8Dtype(), 'HoldeplassTilNavn': str, 'AnkomstHoldeplassTilPlanlagt': str, 'AnkomstHoldeplassTilFaktisk': str, 'Retning': pd.Int8Dtype(), 'TurID': pd.Int32Dtype()}
 df = pd.read_csv("/Users/erikingebrigtsen/Documents/UIB/Master/20241113_48_Bergen_Sentrum_uke_2024_45.csv", sep=";", encoding="utf-8", usecols=usecols, dtype=dtypes)
 df2 = pd.read_csv("/Users/erikingebrigtsen/Documents/UIB/Master/20250505_BS_202411-202505.csv", sep=";", encoding="utf-8", usecols=usecols, dtype=dtypes)
-print(df2.head())
+df3 = pd.read_csv("/Users/erikingebrigtsen/Documents/UIB/Master/20250505_6_81_202411-202505.csv", sep=";", encoding="utf-8", usecols=usecols, dtype=dtypes)
 
-# Create subsets of data set. split on bus lines
+# Create subsets of data sets. split on bus lines
+
+#Old data set
 bus6 = df[df["Rute"] == "6"]        # 6 Birkelundstoppen-Lyngbø
 bus10 = df[df["Rute"] == "10"]      # 10 Wergeland/Søndre Skogveien - Mulen
 bus11 = df[df["Rute"] == "11"]      # 11 Nordnes - Starefossen
@@ -47,6 +49,7 @@ bus49 = df[df["Rute"] == "49"]      # 49 Skoleturer Bergen Sentrum
 bus81 = df[df["Rute"] == "81"]      # 81 Nattlandsfjellet - Mannsverk
 bus82 = df[df["Rute"] == "82"]      # 82 Grønnestølen - Wergeland
 
+#New data set
 bus3df2 = df2[df2["Rute"] == "3"]
 bus12df2 = df2[df2["Rute"] == "12"]
 bus14df2 = df2[df2["Rute"] == "14"]
@@ -67,6 +70,10 @@ bus300Edf2 = df2[df2["Rute"] == "300E"]
 bus310df2 = df2[df2["Rute"] == "310"]
 bus313df2 = df2[df2["Rute"] == "313"]
 
+#New data set (line 6, 81)
+bus6df3 = df3[df3["Rute"] == "6"]
+bus81df3 = df3[df3["Rute"] == "81"]
+
 ## Found one line with <NA> value for direction on bus 39
 bus39df2 = bus39df2.dropna(subset=["Retning"])
 
@@ -74,8 +81,7 @@ bus39df2 = bus39df2.dropna(subset=["Retning"])
 # Put all bus lines together in a list
 # REMOVED LINE 49 - SKOLERUTER
 allBusLinesOLD = [bus6, bus10, bus11, bus12, bus13, bus14, bus15, bus16E, bus18, bus20, bus24, bus40, bus41, bus42, bus43, bus44, bus45, bus46, bus48, bus81, bus82]
-allBusLines =  [bus19df2, bus20df2, bus22df2, bus23df2, bus23Edf2, bus26df2, bus27df2, bus30df2, bus36df2, bus37df2, bus39df2, bus300df2, bus300Edf2, bus310df2, bus313df2]
-#[bus3df2, bus12df2, bus14df2, bus16Edf2,
+allBusLines =  [bus6df3, bus81df3, bus3df2, bus12df2, bus14df2, bus16Edf2, bus19df2, bus20df2, bus22df2, bus23df2, bus23Edf2, bus26df2, bus27df2, bus30df2, bus36df2, bus37df2, bus39df2, bus300df2, bus300Edf2, bus310df2, bus313df2]
 
 #%%
 # Compute deviations for all stops on all bus lines
@@ -94,7 +100,7 @@ line_deviations = {}
 for x in deviation_dict:
     line_deviations[x] = []
     for (stop, direction, sequence, deviations) in deviation_dict[x]:
-        if direction == 1:
+        if direction == 2:
             line_deviations[x] += deviations
             colorKey = str(direction) + x
             label = f'{stop} seq {sequence}'
@@ -105,11 +111,11 @@ for x in deviation_dict:
     plt.xlim(right=20)
     plt.xlabel('Deviations in minutes from planned time')
     plt.ylabel('Cumulative Probability')
-    plt.title(f'Line {x} Direction 1')
+    plt.title(f'Line {x} Direction 2')
     plt.grid(True)
     # plt.legend()
     y = f'0{x}' if len(x) <2 else x
-    plt.savefig(f'/Users/erikingebrigtsen/Documents/UIB/Master/CDF_{y}_retning_1.png')
+    plt.savefig(f'/Users/erikingebrigtsen/Documents/UIB/Master/CDFplots/CDF_{y}_retning_2.png')
     plt.show()
         
     print(line_deviations)
